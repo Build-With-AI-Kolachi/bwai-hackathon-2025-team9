@@ -36,7 +36,7 @@ app.add_middleware(
 
 logger = logging.getLogger(__name__)
 embeddings = OpenAIEmbeddings()
-faiss_embeddings = FAISS.load_local("./index", OpenAIEmbeddings())
+faiss_embeddings = FAISS.load_local("./index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 
 @app.get("/check_status")
 def check_status():
