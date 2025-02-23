@@ -6,3 +6,4 @@ beautifulsoup4
 requests
 faiss-cpu
 uvicorn
+gunicorn
