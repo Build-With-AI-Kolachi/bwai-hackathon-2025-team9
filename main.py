@@ -19,20 +19,12 @@ load_dotenv(find_dotenv())
 # Custom Imports
 from utils import *
 
-
-
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# app = FastAPI()
-
-
-
-
 app = FastAPI()
-origins = ["http://localhost:8080","https://your-vue-app.vercel.app"]
+origins = ["http://localhost:8080", "https://your-vue-app.vercel.app"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,9 +33,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 logger = logging.getLogger(__name__)
 embeddings = OpenAIEmbeddings()
-faiss_embeddings = None
+faiss_embeddings = FAISS.load_local("./index", OpenAIEmbeddings())
 
 @app.get("/check_status")
 def check_status():
@@ -61,47 +54,47 @@ def generate_vector(
     logger.info("Options: %s", selectedOptions)
     logger.info("Categories: %s", categories)
     global faiss_embeddings
-    
-    if not selectedOptions:
-        logger.warning("No selectedOptions provided.")
-        raise HTTPException(status_code=400, detail="No selectedOptions provided.")
-    
-    if not categories:
-        logger.warning("No categories provided.")
-        raise HTTPException(status_code=400, detail="No categories provided.")
-    
-    try:
-        documents = []
-        for option in selectedOptions:
-            docs = get_categories_data(category=option, categories=categories)
-            if docs:
-                documents.extend(docs)
-                time.sleep(0.5)
-            else:
-                logger.warning(f"No documents found for option: {option}")
-        
-        if not documents:
-            logger.warning("No documents generated from provided selectedOptions.")
-            raise HTTPException(status_code=400, detail="No documents generated from provided selectedOptions.")
-        
-        logger.info("Documents loaded and split successfully.")
+    return {"success": True, "message": "Vector generated successfully."}
 
-        vectorstore = FAISS.from_documents(documents, embedding=OpenAIEmbeddings())
-        vectorstore.save_local("../index")
-        
-        faiss_embeddings = FAISS.load_local("../index", OpenAIEmbeddings())
-        logger.info("Vector store created and saved successfully.")
-        
-        return {"success": True, "message": "Vector generated successfully."}
+    # if not selectedOptions:
+    #     logger.warning("No selectedOptions provided.")
+    #     raise HTTPException(status_code=400, detail="No selectedOptions provided.")
     
-    except FileNotFoundError as e:
-        logger.error(f"File not found: {e}", exc_info=True)
-        raise HTTPException(status_code=404, detail="File not found.")
+    # if not categories:
+    #     logger.warning("No categories provided.")
+    #     raise HTTPException(status_code=400, detail="No categories provided.")
     
-    except Exception as e:
-        logger.error(f"An unexpected error occurred: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+    # try:
+    #     documents = []
+    #     for option in selectedOptions:
+    #         docs = get_categories_data(category=option, categories=categories)
+    #         if docs:
+    #             documents.extend(docs)
+    #             time.sleep(0.5)
+    #         else:
+    #             logger.warning(f"No documents found for option: {option}")
+        
+    #     if not documents:
+    #         logger.warning("No documents generated from provided selectedOptions.")
+    #         raise HTTPException(status_code=400, detail="No documents generated from provided selectedOptions.")
+        
+    #     logger.info("Documents loaded and split successfully.")
 
+    #     vectorstore = FAISS.from_documents(documents, embedding=OpenAIEmbeddings())
+    #     vectorstore.save_local("../index")
+        
+    #     faiss_embeddings = FAISS.load_local("../index", OpenAIEmbeddings())
+    #     logger.info("Vector store created and saved successfully.")
+        
+    #     return {"success": True, "message": "Vector generated successfully."}
+    
+    # except FileNotFoundError as e:
+    #     logger.error(f"File not found: {e}", exc_info=True)
+    #     raise HTTPException(status_code=404, detail="File not found.")
+    
+    # except Exception as e:
+    #     logger.error(f"An unexpected error occurred: {e}", exc_info=True)
+    #     raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 @app.get("/get_categories")
 def get_categories():
@@ -152,7 +145,6 @@ def get_categories():
         return []
 
     return categories
-
 
 @app.post('/generate_response')
 def generate_response(input: Dict[str, str] = Body(...)):
