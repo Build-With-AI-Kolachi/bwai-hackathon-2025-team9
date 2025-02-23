@@ -162,3 +162,7 @@ def generate_response(input: Dict[str, str] = Body(...)):
     print("Received input_text:", input_text)  # Print received data
     vector_store_retriever = faiss_embeddings.as_retriever()
     return generate_response_util(input_text, vector_store_retriever)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
