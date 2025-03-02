@@ -10,32 +10,26 @@ class ResponseBuilder:
         """# Using Overview: {overview}, Detailed Analysis: {analysis}, References: {references}   Answer the following query: {query}"""
 
         # Define the prompt template with placeholders for dynamic content
-        clearification_prompt_template = """
-        I'd be happy to help with your {domain} issue! However, I need more details to assist you effectively.
-        Could you please provide more information, such as:
+        clearification_prompt_template = """I'd be happy to help with your {domain} issue! However, I need more details to assist you effectively.
+Could you please provide more information, such as:
 
-        1) A brief description of your issue (without sharing sensitive personal details).
-        2) What kind of assistance you need?.
-        
-        Once I have more details, I can offer relevant insights or point you in the right direction!
-        """
+1) A brief description of your issue (without sharing sensitive personal details).
+2) What kind of assistance you need?.
+
+Once I have more details, I can offer relevant insights or point you in the right direction!"""
 
 
 
         structured_prompt_template = """
-        
-        
-        Response Format:
-        **Overview**: {overview}
-        
-        **Detailed Analysis**:
-        {analysis}
-        
-        **References**:
-        {references}
-        
-        **Disclaimer**: {disclaimer}
-        """
+Overview: {overview}
+
+Detailed Analysis:
+{analysis}
+
+References:
+{references}
+
+Disclaimer: {disclaimer}"""
         # Initialize the PromptTemplate with the defined template and input variables
         self.structured_prompt = PromptTemplate(template=structured_prompt_template, input_variables=["overview", "analysis", "references", "disclaimer","query"])
         self.clarification_prompt = PromptTemplate(template=clearification_prompt_template, input_variables=["domain"])
@@ -64,7 +58,7 @@ class ResponseBuilder:
 
     def _generate_overview(self, inputs):
         # Generate the overview section of the response
-        overview = f"This matter involves {inputs['domain']} which states: {inputs['analysis'][0]['main_principle']}"
+        overview = f"This issue pertains to the {inputs['domain']} domain, primarily governed by the principle: {inputs['analysis'][0]['main_principle']}."
         return overview
 
     def _format_analysis(self, analysis):

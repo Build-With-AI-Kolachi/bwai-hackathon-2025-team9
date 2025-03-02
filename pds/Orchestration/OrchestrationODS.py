@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import List, Dict
 
 # class ResercherODS(BaseModel):
@@ -21,11 +21,12 @@ class AnalysisODS(BaseModel):
     """
     Output Data Schema for Orchestration Chain - Analysis
     """
-    main_principle: str = Field(..., title="Main Principle", description="The main principle derived from the analysis.")
-    points: List[Dict[str, str]] = Field(..., title="Points", description="List of points with principles and sections.")
+    main_principle: str = Field(..., title="Main Principle", description="The main principle derived from the analysis. Note: should follow json formatting.")
+    points: List[Dict[str, str]] = Field(..., title="Points", description="List of points with principles and sections. Note: should follow json formatting.")
+
 
 class VerifierODS(BaseModel):
     """
     Output Data Schema for Orchestration Chain - Context Interpretation Verification
     """
-    analysis: Dict[str,AnalysisODS] = Field(..., title="Analysis", description="Dict of Detailed analysis provided by the verifier.")
+    analysis: List[AnalysisODS] = Field(..., title="Analysis", description="Dict of Detailed analysis provided by the verifier. Note: should follow json formatting.")

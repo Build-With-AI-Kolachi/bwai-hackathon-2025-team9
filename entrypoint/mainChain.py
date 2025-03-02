@@ -2,6 +2,8 @@
 import logging
 from langchain.schema.runnable import RunnablePassthrough
 from langchain_core.runnables import RunnableBranch
+from langchain_core.output_parsers import JsonOutputParser
+from langchain.schema.output_parser import StrOutputParser
 
 # Importing Chains
 from chains.preprocessing_chain import PreprocessingChain
@@ -52,6 +54,7 @@ class Chatbot:
             | self.preprocessor.process
             | self.domain_analysis.classify_domain
             | self.branch
+            | StrOutputParser()
         )
         
 

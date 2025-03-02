@@ -26,35 +26,38 @@ class ResearchOrchestrator:
 
     def analyze(self, inputs):
         logger.info(f"Starting research of query in {inputs['domain']} domain")
-
-        # Extract preprocessed data
-        cleaned_query = inputs.get("cleaned_query")
-        # logger.info("Extracted cleaned_query: %s", cleaned_query) 
-        
-        # Research Phase
-        logger.info("Starting research phase")
-        context_documents = self.researcher.invoke(cleaned_query)
-        
-        # Compile context from retrieved documents
-        context = ' '.join(doc.page_content for doc in context_documents)
-        # logger.info("Compiled context: %s", context)
-        
-        # Analysis Phase
-        logger.info("Starting analysis phase")
-        analyst_response = self.analyst.invoke({"context": context})
-        # logger.info("Analysis phase completed with interpretation: %s", analyst_response)
-        
-        # Verification Phase
-        logger.info("Starting verification phase")
-        verified = self.verifier.invoke({
-            "interpretation": analyst_response['interpretation'],
-            "references": analyst_response['references'],
-            "context": context
-        })
-        # logger.info("Verification phase completed with verified analysis: %s", verified)
-        logger.info("Research Completed")
-        
-        return {**inputs, "analysis": verified, "analyst_response": analyst_response}
+        if inputs['sub_category'] == 'Needs Clarification':
+            return {**inputs}
+        else:
+            # Extract preprocessed data
+            cleaned_query = inputs.get("cleaned_query")
+            # logger.info("Extracted cleaned_query: %s", cleaned_query) 
+            
+            # Research Phase
+            logger.info("Starting research phase")
+            context_documents = self.researcher.invoke(cleaned_query)
+            
+            # Compile context from retrieved documents
+            context = ' '.join(doc.page_content for doc in context_documents)
+            # logger.info("Compiled context: %s", context)
+            
+            # Analysis Phase
+            logger.info("Starting analysis phase")
+            analyst_response = self.analyst.invoke({"context": context, "query": cleaned_query})
+            # logger.info("Analysis phase completed with interpretation: %s", analyst_response)
+            
+            # Verification Phase
+            logger.info("Starting verification phase")
+            verified = self.verifier.invoke({
+                "interpretation": analyst_response['interpretation'],
+                "references": analyst_response['references'],
+                "context": context,
+                "query": cleaned_query
+            })
+            # logger.info("Verification phase completed with verified analysis: %s", verified)
+            logger.info("Research Completed with {"+ f"analysis: { verified['analysis'] }, analyst_response: {analyst_response}"+"}")
+            
+            return {**inputs, "analysis":  verified['analysis'], "analyst_response": analyst_response}
     
     def _create_researcher(self):
         """Creates a domain-agnostic research agent"""
@@ -68,8 +71,9 @@ class ResearchOrchestrator:
         # logger.info("Creating analyst agent")
 
         # Define the prompt template for the analyst
-        prompt_template = """You are an expert analyst. Interpret the context strictly and provide references found in the context.
+        prompt_template = """You are an expert analyst. Interpret the context strictly based on the provided query and provide references found in the context.
                              Output Format: {format_instructions}
+                             Query: {query}
                              Context: {context}"""
         
         # Initialize the output parser
@@ -77,11 +81,11 @@ class ResearchOrchestrator:
         format_instructions = parser.get_format_instructions()
 
         # Create the prompt with format instructions
-        prompt = PromptTemplate(template=prompt_template, input_variables=["context"], partial_variables={"format_instructions": format_instructions})
+        prompt = PromptTemplate(template=prompt_template, input_variables=["context","query"], partial_variables={"format_instructions": format_instructions})
         # logger.info(f"Prompt with Format Instructions: {prompt}")
 
         # Create the LLM for the analyst
-        analyst = create_llm(model="gpt-4o-mini", temperature=0)
+        analyst = create_llm(model="gpt-4o-mini", temperature=0.8)
         
         # Chain the prompt, LLM, and parser together
         analyst_chain = prompt | analyst | parser
@@ -100,17 +104,17 @@ class ResearchOrchestrator:
                    Output Format: {format_instructions} 
                    In Analysis: {interpretation}
                    and references : {references}
-                   Based on {context}"""
+                   Based on {context} and the provided query {query}"""
         
         # Initialize the output parser
         parser = JsonOutputParser(pydantic_object=VerifierODS)
         format_instructions = parser.get_format_instructions()
 
         # Create the prompt with format instructions
-        prompt = PromptTemplate(template=prompt_template, input_variables=['context', 'interpretation', 'references'], partial_variables={"format_instructions": format_instructions})
+        prompt = PromptTemplate(template=prompt_template, input_variables=['context', 'interpretation', 'references','query'], partial_variables={"format_instructions": format_instructions})
         
         # Create the LLM for the verifier
-        verifier = create_llm(model="gpt-4o-mini", temperature=0)
+        verifier = create_llm(model="gpt-4", temperature=0.8)
         
         # Chain the prompt, LLM, and parser together
         verifier_chain = prompt | verifier | parser
