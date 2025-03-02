@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-origins = ["http://localhost:8080", "https://vue-fe-chatbot-bgc0q4bn2-iamhassanabs-projects.vercel.app"]
+origins = ["http://localhost:8080", "https://vue-fe-chatbot-bgc0q4bn2-iamhassanabs-projects.vercel.app","https://vue-fe-chatbot-cn7m7m5w8-iamhassanabs-projects.vercel.app"]
 
 app.add_middleware(
     CORSMiddleware,
