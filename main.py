@@ -158,8 +158,8 @@ def generate_response(input: Dict[str, str] = Body(...)):
         raise HTTPException(status_code=400, detail="input_text is required")
     
     response = bot.chat(input.get("input_text"))
-    print("Response from the Bot: ",response)
-    return response
+    logger.info(f"Response from the Bot: {response}")
+    return {"response":response.content}
 
     # input_text = input.get("input_text")
     # if not input_text:
