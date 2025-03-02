@@ -159,7 +159,7 @@ def generate_response(input: Dict[str, str] = Body(...)):
     
     response = bot.chat(input.get("input_text"))
     logger.info(f"Response from the Bot: {response}")
-    return {"response":response.content}
+    return {"response":response}
 
     # input_text = input.get("input_text")
     # if not input_text:
