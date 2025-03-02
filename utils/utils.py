@@ -22,8 +22,19 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 
+
+from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain.chat_models import ChatOpenAI
+from langchain.schema.output_parser import StrOutputParser
+from langchain.schema.runnable import RunnableBranch, RunnableLambda
+from langchain.memory import ConversationBufferMemory
+from langchain.schema.messages import HumanMessage, AIMessage
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+faiss_embeddings = FAISS.load_local("./data/index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 
 # Utilities For The FastApi Service
 def extract_links_info(a):
@@ -194,3 +205,4 @@ def generate_response_util(input_text,vector_store_retriever):
     #     time.sleep(0.05)
 
     return response
+

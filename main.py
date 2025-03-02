@@ -1,23 +1,23 @@
 import logging
 import os
 import time
-from typing import Dict, List, Optional
+from typing import Dict, List
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.document_loaders import PyPDFDirectoryLoader
 import requests
 from fastapi import FastAPI, Body, HTTPException
 from typing import List, Dict
 import logging
+from entrypoint.mainChain import Chatbot
 
 from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 # Custom Imports
-from utils import *
+from utils.utils import *
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -35,8 +35,6 @@ app.add_middleware(
 )
 
 logger = logging.getLogger(__name__)
-embeddings = OpenAIEmbeddings()
-faiss_embeddings = FAISS.load_local("./index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 
 @app.get("/check_status")
 def check_status():
@@ -56,6 +54,8 @@ def generate_vector(
     global faiss_embeddings
     return {"success": True, "message": "Vector generated successfully."}
 
+
+""" Commented Code
     # if not selectedOptions:
     #     logger.warning("No selectedOptions provided.")
     #     raise HTTPException(status_code=400, detail="No selectedOptions provided.")
@@ -95,6 +95,9 @@ def generate_vector(
     # except Exception as e:
     #     logger.error(f"An unexpected error occurred: {e}", exc_info=True)
     #     raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+"""
+
+
 
 @app.get("/get_categories")
 def get_categories():
@@ -148,9 +151,19 @@ def get_categories():
 
 @app.post('/generate_response')
 def generate_response(input: Dict[str, str] = Body(...)):
-    input_text = input.get("input_text")
-    if not input_text:
+
+    # Initialize with your vector store
+    bot = Chatbot(vector_store=faiss_embeddings)
+    if not input.get("input_text"):
         raise HTTPException(status_code=400, detail="input_text is required")
-    print("Received input_text:", input_text)  # Print received data
-    vector_store_retriever = faiss_embeddings.as_retriever()
-    return generate_response_util(input_text, vector_store_retriever)
+    
+    response = bot.chat(input.get("input_text"))
+    print("Response from the Bot: ",response)
+    return response
+
+    # input_text = input.get("input_text")
+    # if not input_text:
+    #     raise HTTPException(status_code=400, detail="input_text is required")
+    # print("Received input_text:", input_text)  # Print received data
+    # vector_store_retriever = faiss_embeddings.as_retriever()
+    # return generate_response_util(input_text, vector_store_retriever)
