@@ -45,4 +45,4 @@ class ResearchOrchestrator:
         response = response_chain.invoke({"query": cleaned_query})
         
         logger.info("Response generated successfully")
-        return {**inputs, "analysis": response['interpretation'], "analyst_response": response}
+        return {**inputs, "priority": response['priority'], "analyst_response": response}

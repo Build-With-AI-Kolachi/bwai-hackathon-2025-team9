@@ -1,6 +1,6 @@
 import logging
 from langchain.agents import AgentExecutor, Tool
-from utils.utils import faiss_embeddings
+# from utils.utils import faiss_embeddings
 from llms.llms import create_llm
 from langchain.prompts import PromptTemplate
 from prompts.templates import analysis_template
@@ -63,5 +63,8 @@ class DomainAnalysisChain:
         return {
             **inputs,
             "domain": response.get("domain"),
-            "sub_category": response.get("sub_category")
+            "sub_category": response.get("sub_category"),
+            "priority": response.get("priority"),
+            "answer": response.get("answer"),
+
         }

@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Chatbot:
-    def __init__(self, vector_store):
+    def __init__(self):
 
         # Initialize the different chains
         self.preprocessor = PreprocessingChain()
@@ -30,14 +30,14 @@ class Chatbot:
         self.orchestrator = ResearchOrchestrator()
         self.general_chain = GeneralChain()
         self.builder = ResponseBuilder()
-        self.validator = ValidatorChain(vector_store)
+        # self.validator = ValidatorChain(vector_store)
         
         # Define the legal chain
         self.branch_chain = (
             RunnablePassthrough()
             | self.orchestrator.analyze 
-            | self.builder.build 
-            | self.validator.validate
+            # | self.builder.build 
+            # | self.validator.validate
         )
         
         # Define the branch logic
@@ -53,8 +53,8 @@ class Chatbot:
             RunnablePassthrough()
             | self.preprocessor.process
             | self.domain_analysis.classify_domain
-            | self.branch
-            | StrOutputParser()
+            # | self.branch
+            # | StrOutputParser()
         )
         
 

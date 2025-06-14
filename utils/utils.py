@@ -34,7 +34,7 @@ from langchain.schema.messages import HumanMessage, AIMessage
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-faiss_embeddings = FAISS.load_local("./data/index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
+# faiss_embeddings = FAISS.load_local("./data/index", OpenAIEmbeddings(), allow_dangerous_deserialization=True)
 
 # Utilities For The FastApi Service
 def extract_links_info(a):

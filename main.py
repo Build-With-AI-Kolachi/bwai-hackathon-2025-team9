@@ -155,7 +155,7 @@ def get_categories():
 def generate_response(input: Dict[str, str] = Body(...)):
 
     # Initialize with your vector store
-    bot = Chatbot(vector_store=faiss_embeddings)
+    bot = Chatbot()
     if not input.get("input_text"):
         raise HTTPException(status_code=400, detail="input_text is required")
     

@@ -8,3 +8,4 @@ faiss-cpu
 uvicorn
 gunicorn
 streamlit
+langchain_google_genai
