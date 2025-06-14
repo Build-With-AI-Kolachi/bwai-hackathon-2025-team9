@@ -7,3 +7,4 @@ requests
 faiss-cpu
 uvicorn
 gunicorn
+streamlit
