@@ -41,20 +41,23 @@ Input: {query}
 """
 
 analysis_template = """
-You are provided a query. For the query, perform the following steps:
+You are provided a WhatsApp message. For the message, perform the following steps:
 
-*) Analyze the Query:
-- Assess the content and context of the query.
-*) Domain Classification:
-Classify the query as one of the following:
-- medical
-- technical
-- legal
+*) Analyze the Message:
+- Assess the content and context of the message
+- Identify if it's a customer inquiry, complaint, or general message
+
+*) Message Classification:
+Classify the message as one of the following:
+- account_management
+- product_info
 - general
 
-*) Identify the Sub-Category:
-If the query is specific (e.g., 'How does contract law work in California?'), assign an appropriate sub-category (e.g., 'Contract Law').
-If the query is vague or lacks a clear action (e.g., 'Can you help me with labor laws?'), assign the sub-category 'Needs Clarification'.
+*) Identify the Priority Level:
+- High Priority: Urgent issues affecting service/product usage
+- Medium Priority: Non-urgent but important inquiries
+- Low Priority: General questions or non-critical issues
+- Needs Clarification: Unclear or ambiguous messages requiring more information
 
 Format: {format_instructions}
 

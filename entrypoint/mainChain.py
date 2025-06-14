@@ -43,7 +43,7 @@ class Chatbot:
         # Define the branch logic
         self.branch = RunnableBranch(
             # Check if the topic is not "legal" and execute general_chain if true.
-            (lambda x: x["domain"] != "legal", self.general_chain.run),
+            (lambda x: x["domain"] == "general", self.general_chain.run),
             # If none of the above conditions match, execute branch_chain.
             self.branch_chain,
         )

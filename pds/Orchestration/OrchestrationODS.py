@@ -14,8 +14,7 @@ class AnalystODS(BaseModel):
     """
     Output Data Schema for Orchestration Chain - Context Analysis
     """
-    interpretation: str = Field(..., title="Interpretation", description="Interpretation of the context")
-    references: List[str] = Field(..., title="References", description="List of references related to the context")
+    answer: str = Field(..., title="Answer", description="Answer to the query")
 
 class AnalysisODS(BaseModel):
     """
